@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: vault
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - configmap.yaml
+  - service-headless.yaml
+  - service.yaml
+  - statefulset.yaml
+  - pdb.yaml
+  - networkpolicy-default-deny.yaml
+  - networkpolicy-allow-internal.yaml
+  - networkpolicy-allow-dns.yaml
