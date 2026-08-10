@@ -16,6 +16,8 @@ spec:
         app.kubernetes.io/name: vault
     spec:
       serviceAccountName: vault
+      securityContext:
+        fsGroup: 100
       terminationGracePeriodSeconds: 30
       affinity:
         podAntiAffinity:
@@ -63,6 +65,8 @@ spec:
               containerPort: 8201
           securityContext:
             runAsNonRoot: true
+            runAsUser: 100
+            runAsGroup: 100
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
             capabilities:
