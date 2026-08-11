@@ -14,6 +14,7 @@ This repository contains a GitOps-friendly deployment of HashiCorp Vault for k3s
 ```text
 argocd/
   vault-application.yaml
+  vault-userpass-bootstrap-application.yaml
 k8s/
   base/
     configmap.yaml
@@ -32,12 +33,15 @@ k8s/
       kustomization.yaml
       service-patch.yaml
       statefulset-patch.yaml
+    userpass-bootstrap/
+      kustomization.yaml
 ```
 
 ## Design choices
 
 - Uses integrated Raft instead of Consul to keep the stack smaller and easier to operate on k3s.
 - Leaves the initial `vault operator init` and unseal flow as a manual step so no bootstrap secrets are committed to Git.
+- Includes a GitOps bootstrap Job for `userpass` users that reads secrets from SealedSecrets.
 - Exposes Vault directly through `NodePort` so you can access it with the IP of a k3s node.
 - Uses the k3s `local-path` storage class in the overlay.
 - Keeps the initial deployment single-node so direct IP access works reliably without standby redirects.
@@ -104,6 +108,49 @@ Validate status:
 ```bash
 kubectl -n vault exec -it vault-0 -- vault status
 ```
+
+## GitOps userpass bootstrap
+
+This repository now includes a separate Argo CD Application that can upsert a Vault `userpass` account such as `kalcala` when you are ready to run it.
+
+Apply it only after the SealedSecrets exist:
+
+```bash
+kubectl apply -f argocd/vault-userpass-bootstrap-application.yaml
+```
+
+### Required sealed secrets
+
+Create these as `SealedSecret` resources in the `vault` namespace:
+
+- `vault-bootstrap-token`
+  - key: `token`
+  - value: a Vault token with permission to manage `auth/userpass`
+- `vault-userpass-kalcala`
+  - key: `password`
+  - value: the `userpass` password for `kalcala`
+
+### Example generation flow
+
+```bash
+kubectl -n vault create secret generic vault-bootstrap-token \
+  --from-literal=token='YOUR_ADMIN_TOKEN' \
+  --dry-run=client -o yaml | kubeseal --format yaml > vault-bootstrap-token.sealedsecret.yaml
+
+kubectl -n vault create secret generic vault-userpass-kalcala \
+  --from-literal=password='YOUR_PASSWORD' \
+  --dry-run=client -o yaml | kubeseal --format yaml > vault-userpass-kalcala.sealedsecret.yaml
+```
+
+### Behavior
+
+The bootstrap Job:
+- waits for Vault to be reachable,
+- ensures the `userpass` auth method exists,
+- writes/updates `auth/userpass/users/kalcala`,
+- applies the policies configured in the Job (`default` by default).
+
+Update `KALCALA_POLICIES` in the Job if the user should map to an additional policy from your HCP Vault setup.
 
 ## Recommended next steps
 
