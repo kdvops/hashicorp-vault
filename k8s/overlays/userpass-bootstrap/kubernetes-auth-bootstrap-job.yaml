@@ -24,8 +24,6 @@ spec:
             - /bin/sh
             - /scripts/bootstrap-kubernetes-auth.sh
           env:
-            - name: VAULT_ADDR
-              value: http://vault.vault.svc.cluster.local:8200
             - name: VAULT_NAMESPACE
               value: vault
             - name: K8S_AUTH_MOUNT
