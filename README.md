@@ -148,7 +148,7 @@ The bootstrap Job:
 - waits for Vault to be reachable,
 - ensures the `userpass` auth method exists,
 - writes/updates `auth/userpass/users/hermes`,
-  - applies the policies configured in the Job (`admin` by default).
+- applies the policies configured in the Job (`admin` by default).
 
 Update `HERMES_POLICIES` in the Job if the user should map to an additional policy from your Vault setup.
 
