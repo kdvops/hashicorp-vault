@@ -200,9 +200,9 @@ vault write auth/userpass/users/kalcala \
 
 #### Crear usuario y asignar a policy en 1 solo paso 
 
-#vault write auth/userpass/users/kalcala \
-#  password='TuPasswordSegura' \
-#  token_policies='admin'
+#### vault write auth/userpass/users/kalcala \
+####  password='TuPasswordSegura' \
+####  token_policies='admin'
   
 #### leer detalles de usuario   
 vault read auth/userpass/users/kalcala
