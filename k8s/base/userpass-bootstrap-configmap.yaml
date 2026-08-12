@@ -9,18 +9,18 @@ data:
     set -eu
 
     : "${VAULT_ADDR:=http://vault.vault.svc.cluster.local:8200}"
-    : "${KALCALA_USERNAME:=kalcala}"
-    : "${KALCALA_POLICIES:=default}"
-    : "${KALCALA_MOUNT:=userpass}"
-    : "${KALCALA_TTL:=0}"
+    : "${HERMES_USERNAME:=hermes}"
+    : "${HERMES_POLICIES:=admin}"
+    : "${HERMES_MOUNT:=userpass}"
+    : "${HERMES_TTL:=0}"
 
     if [ -z "${VAULT_TOKEN:-}" ]; then
       echo "VAULT_TOKEN is required" >&2
       exit 1
     fi
 
-    if [ -z "${KALCALA_PASSWORD:-}" ]; then
-      echo "KALCALA_PASSWORD is required" >&2
+    if [ -z "${HERMES_PASSWORD:-}" ]; then
+      echo "HERMES_PASSWORD is required" >&2
       exit 1
     fi
 
@@ -43,17 +43,17 @@ data:
       exit 1
     fi
 
-    if ! vault auth list 2>/dev/null | grep -q "^${KALCALA_MOUNT}/"; then
-      echo "Enabling userpass auth at ${KALCALA_MOUNT}/"
-      vault auth enable "${KALCALA_MOUNT}"
+    if ! vault auth list 2>/dev/null | grep -q "^${HERMES_MOUNT}/"; then
+      echo "Enabling userpass auth at ${HERMES_MOUNT}/"
+      vault auth enable "${HERMES_MOUNT}"
     else
-      echo "userpass auth already enabled at ${KALCALA_MOUNT}/"
+      echo "userpass auth already enabled at ${HERMES_MOUNT}/"
     fi
 
-    echo "Upserting user ${KALCALA_USERNAME} with policies: ${KALCALA_POLICIES}"
-    vault write "auth/${KALCALA_MOUNT}/users/${KALCALA_USERNAME}" \
-      password="${KALCALA_PASSWORD}" \
-      policies="${KALCALA_POLICIES}" \
-      token_ttl="${KALCALA_TTL}"
+    echo "Upserting user ${HERMES_USERNAME} with policies: ${HERMES_POLICIES}"
+    vault write "auth/${HERMES_MOUNT}/users/${HERMES_USERNAME}" \
+      password="${HERMES_PASSWORD}" \
+      policies="${HERMES_POLICIES}" \
+      token_ttl="${HERMES_TTL}"
 
-    echo "Userpass bootstrap completed for ${KALCALA_USERNAME}"
+    echo "Userpass bootstrap completed for ${HERMES_USERNAME}"

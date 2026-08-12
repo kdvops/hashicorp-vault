@@ -26,23 +26,23 @@ spec:
           env:
             - name: VAULT_ADDR
               value: http://vault.vault.svc.cluster.local:8200
-            - name: KALCALA_USERNAME
-              value: kalcala
-            - name: KALCALA_POLICIES
-              value: default
-            - name: KALCALA_MOUNT
+            - name: HERMES_USERNAME
+              value: hermes
+            - name: HERMES_POLICIES
+              value: admin
+            - name: HERMES_MOUNT
               value: userpass
-            - name: KALCALA_TTL
+            - name: HERMES_TTL
               value: "0"
             - name: VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: vault-bootstrap-token
                   key: token
-            - name: KALCALA_PASSWORD
+            - name: HERMES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: vault-userpass-kalcala
+                  name: vault-userpass-hermes
                   key: password
           volumeMounts:
             - name: bootstrap-script

@@ -111,7 +111,7 @@ kubectl -n vault exec -it vault-0 -- vault status
 
 ## GitOps userpass bootstrap
 
-This repository now includes a separate Argo CD Application that can upsert a Vault `userpass` account such as `kalcala` when you are ready to run it.
+This repository now includes a separate Argo CD Application that can upsert a Vault `userpass` account such as `hermes` when you are ready to run it.
 
 Apply it only after the SealedSecrets exist:
 
@@ -126,9 +126,9 @@ Create these as `SealedSecret` resources in the `vault` namespace:
 - `vault-bootstrap-token`
   - key: `token`
   - value: a Vault token with permission to manage `auth/userpass`
-- `vault-userpass-kalcala`
+- `vault-userpass-hermes`
   - key: `password`
-  - value: the `userpass` password for `kalcala`
+  - value: the `userpass` password for `hermes`
 
 ### Example generation flow
 
@@ -137,9 +137,9 @@ kubectl -n vault create secret generic vault-bootstrap-token \
   --from-literal=token='YOUR_ADMIN_TOKEN' \
   --dry-run=client -o yaml | kubeseal --format yaml > vault-bootstrap-token.sealedsecret.yaml
 
-kubectl -n vault create secret generic vault-userpass-kalcala \
+kubectl -n vault create secret generic vault-userpass-hermes \
   --from-literal=password='YOUR_PASSWORD' \
-  --dry-run=client -o yaml | kubeseal --format yaml > vault-userpass-kalcala.sealedsecret.yaml
+  --dry-run=client -o yaml | kubeseal --format yaml > vault-userpass-hermes.sealedsecret.yaml
 ```
 
 ### Behavior
@@ -147,10 +147,10 @@ kubectl -n vault create secret generic vault-userpass-kalcala \
 The bootstrap Job:
 - waits for Vault to be reachable,
 - ensures the `userpass` auth method exists,
-- writes/updates `auth/userpass/users/kalcala`,
-- applies the policies configured in the Job (`default` by default).
+- writes/updates `auth/userpass/users/hermes`,
+  - applies the policies configured in the Job (`admin` by default).
 
-Update `KALCALA_POLICIES` in the Job if the user should map to an additional policy from your HCP Vault setup.
+Update `HERMES_POLICIES` in the Job if the user should map to an additional policy from your Vault setup.
 
 ## Recommended next steps
 
@@ -195,25 +195,25 @@ vault auth list
 #vault auth enable userpass
 
 #### Crear usuario
-vault write auth/userpass/users/kalcala \
+vault write auth/userpass/users/hermes \
   password='TuPasswordSegura'
 
 #### Crear usuario y asignar a policy en 1 solo paso 
 
-#### vault write auth/userpass/users/kalcala \
+#### vault write auth/userpass/users/hermes \
 ####  password='TuPasswordSegura' \
 ####  token_policies='admin'
   
 #### leer detalles de usuario   
-vault read auth/userpass/users/kalcala
+vault read auth/userpass/users/hermes
 
 #### asignar policy a usuario
-vault write auth/userpass/users/kalcala \
+vault write auth/userpass/users/hermes \
   token_policies="admin"
 
 
 #### hacer login usando userpass
-vault login -method=userpass username=kalcala
+vault login -method=userpass username=hermes
 
 #### ver detalles de usuario logueado
 vault token lookup

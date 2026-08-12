@@ -49,7 +49,7 @@
 - Initial Vault unseal keys and root token are generated manually during `vault operator init` and must be stored offline.
 - GitOps `userpass` bootstrap expects two SealedSecrets in the `vault` namespace:
   - `vault-bootstrap-token` with key `token`
-  - `vault-userpass-kalcala` with key `password`
+  - `vault-userpass-hermes` with key `password`
 - Any future auth methods, policies, or K8s auth config should live in separate manifests or external secret management, not in plaintext here.
 
 ## Repo-specific hazards
