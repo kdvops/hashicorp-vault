@@ -4,3 +4,5 @@ namespace: vault
 resources:
   - userpass-bootstrap-configmap.yaml
   - userpass-bootstrap-job.yaml
+  - vault-bootstrap-token.sealedsecret.yaml
+  - vault-userpass-hermes.sealedsecret.yaml

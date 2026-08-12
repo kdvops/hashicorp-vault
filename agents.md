@@ -26,7 +26,7 @@
 - `k8s/overlays/k3s/`
   - patches the service and statefulset for k3s defaults
 - `k8s/overlays/userpass-bootstrap/`
-  - deploys only the userpass bootstrap ConfigMap + Job
+  - deploys the userpass bootstrap ConfigMap + Job + SealedSecrets
 
 ## Operational dependencies
 - Requires Argo CD and a target Kubernetes cluster.
@@ -47,7 +47,7 @@
 ## Secret / credential locations
 - No bootstrap secrets are committed to the repo.
 - Initial Vault unseal keys and root token are generated manually during `vault operator init` and must be stored offline.
-- GitOps `userpass` bootstrap expects two SealedSecrets in the `vault` namespace:
+- GitOps `userpass` bootstrap includes two SealedSecrets in the `vault` namespace:
   - `vault-bootstrap-token` with key `token`
   - `vault-userpass-hermes` with key `password`
 - Any future auth methods, policies, or K8s auth config should live in separate manifests or external secret management, not in plaintext here.

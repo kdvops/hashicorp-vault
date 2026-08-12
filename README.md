@@ -34,6 +34,8 @@ k8s/
       service-patch.yaml
       statefulset-patch.yaml
     userpass-bootstrap/
+      vault-bootstrap-token.sealedsecret.yaml
+      vault-userpass-hermes.sealedsecret.yaml
       kustomization.yaml
 ```
 
@@ -41,7 +43,7 @@ k8s/
 
 - Uses integrated Raft instead of Consul to keep the stack smaller and easier to operate on k3s.
 - Leaves the initial `vault operator init` and unseal flow as a manual step so no bootstrap secrets are committed to Git.
-- Includes a GitOps bootstrap Job for `userpass` users that reads secrets from SealedSecrets.
+- Includes a GitOps bootstrap Job for `userpass` users that reads secrets from SealedSecrets committed in the repo.
 - Exposes Vault directly through `NodePort` so you can access it with the IP of a k3s node.
 - Uses the k3s `local-path` storage class in the overlay.
 - Keeps the initial deployment single-node so direct IP access works reliably without standby redirects.
@@ -113,7 +115,7 @@ kubectl -n vault exec -it vault-0 -- vault status
 
 This repository now includes a separate Argo CD Application that can upsert a Vault `userpass` account such as `hermes` when you are ready to run it.
 
-Apply it only after the SealedSecrets exist:
+The SealedSecrets are committed in `k8s/overlays/userpass-bootstrap/`, so the application can be applied directly:
 
 ```bash
 kubectl apply -f argocd/vault-userpass-bootstrap-application.yaml
@@ -121,7 +123,7 @@ kubectl apply -f argocd/vault-userpass-bootstrap-application.yaml
 
 ### Required sealed secrets
 
-Create these as `SealedSecret` resources in the `vault` namespace:
+These `SealedSecret` resources live in the `vault` namespace:
 
 - `vault-bootstrap-token`
   - key: `token`
@@ -130,7 +132,7 @@ Create these as `SealedSecret` resources in the `vault` namespace:
   - key: `password`
   - value: the `userpass` password for `hermes`
 
-### Example generation flow
+### Rotation flow
 
 ```bash
 kubectl -n vault create secret generic vault-bootstrap-token \
@@ -141,6 +143,8 @@ kubectl -n vault create secret generic vault-userpass-hermes \
   --from-literal=password='YOUR_PASSWORD' \
   --dry-run=client -o yaml | kubeseal --format yaml > vault-userpass-hermes.sealedsecret.yaml
 ```
+
+Use that flow again whenever you need to rotate either secret.
 
 ### Behavior
 
