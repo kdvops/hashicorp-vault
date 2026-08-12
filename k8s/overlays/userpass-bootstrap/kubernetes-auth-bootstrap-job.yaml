@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vault-kubernetes-auth-bootstrap
+  namespace: vault
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "21"
+spec:
+  backoffLimit: 5
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vault-kubernetes-auth-bootstrap
+    spec:
+      serviceAccountName: vault
+      restartPolicy: Never
+      containers:
+        - name: vault-cli
+          image: hashicorp/vault:2.0.3
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - /scripts/bootstrap-kubernetes-auth.sh
+          env:
+            - name: VAULT_ADDR
+              value: http://vault.vault.svc.cluster.local:8200
+            - name: VAULT_NAMESPACE
+              value: vault
+            - name: K8S_AUTH_MOUNT
+              value: kubernetes
+            - name: K8S_ROLE_NAME
+              value: hermes-agent
+            - name: K8S_ROLE_NAMESPACE
+              value: hermes
+            - name: K8S_ROLE_SERVICE_ACCOUNT
+              value: hermes-agent
+            - name: K8S_ROLE_POLICIES
+              value: admin
+            - name: K8S_ROLE_TTL
+              value: 1h
+            - name: VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: vault-bootstrap-token
+                  key: token
+          volumeMounts:
+            - name: bootstrap-script
+              mountPath: /scripts
+              readOnly: true
+      volumes:
+        - name: bootstrap-script
+          configMap:
+            name: vault-kubernetes-auth-bootstrap
+            defaultMode: 0755
+            items:
+              - key: bootstrap-kubernetes-auth.sh
+                path: bootstrap-kubernetes-auth.sh

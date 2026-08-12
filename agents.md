@@ -19,14 +19,14 @@
   - source path: `k8s/overlays/k3s`
   - destination namespace: `vault`
 - `argocd/vault-userpass-bootstrap-application.yaml`
-  - optional Argo CD `Application` for the `userpass` bootstrap Job
+  - optional Argo CD `Application` for the auth bootstrap Jobs
   - source path: `k8s/overlays/userpass-bootstrap`
 - `k8s/base/`
   - namespace, service account, config map, headless service, service, statefulset, PDB, network policies
 - `k8s/overlays/k3s/`
   - patches the service and statefulset for k3s defaults
 - `k8s/overlays/userpass-bootstrap/`
-  - deploys the userpass bootstrap ConfigMap + Job + SealedSecrets
+  - deploys the userpass bootstrap ConfigMap + Job + SealedSecrets plus the Kubernetes auth bootstrap
 
 ## Operational dependencies
 - Requires Argo CD and a target Kubernetes cluster.
@@ -50,6 +50,7 @@
 - GitOps `userpass` bootstrap includes two SealedSecrets in the `vault` namespace:
   - `vault-bootstrap-token` with key `token`
   - `vault-userpass-hermes` with key `password`
+- The same overlay also configures Kubernetes auth for the `hermes-agent` service account in the `hermes` namespace.
 - Any future auth methods, policies, or K8s auth config should live in separate manifests or external secret management, not in plaintext here.
 
 ## Repo-specific hazards

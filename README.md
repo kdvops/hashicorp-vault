@@ -34,6 +34,8 @@ k8s/
       service-patch.yaml
       statefulset-patch.yaml
     userpass-bootstrap/
+      kubernetes-auth-bootstrap-configmap.yaml
+      kubernetes-auth-bootstrap-job.yaml
       vault-bootstrap-token.sealedsecret.yaml
       vault-userpass-hermes.sealedsecret.yaml
       kustomization.yaml
@@ -43,7 +45,7 @@ k8s/
 
 - Uses integrated Raft instead of Consul to keep the stack smaller and easier to operate on k3s.
 - Leaves the initial `vault operator init` and unseal flow as a manual step so no plaintext bootstrap secrets are committed to Git.
-- Includes a GitOps bootstrap Job for `userpass` users that reads secrets from SealedSecrets committed in the repo.
+- Includes GitOps bootstrap Jobs for `userpass` users and Kubernetes auth roles that read secrets from SealedSecrets committed in the repo.
 - Exposes Vault directly through `NodePort` so you can access it with the IP of a k3s node.
 - Uses the k3s `local-path` storage class in the overlay.
 - Keeps the initial deployment single-node so direct IP access works reliably without standby redirects.
@@ -111,9 +113,9 @@ Validate status:
 kubectl -n vault exec -it vault-0 -- vault status
 ```
 
-## GitOps userpass bootstrap
+## GitOps auth bootstrap
 
-This repository now includes a separate Argo CD Application that can upsert a Vault `userpass` account such as `hermes` when you are ready to run it.
+This repository now includes a separate Argo CD Application that can upsert a Vault `userpass` account such as `hermes` and bootstrap Kubernetes auth for workloads such as `hermes-agent`.
 
 The SealedSecrets are committed in `k8s/overlays/userpass-bootstrap/`, so the application can be applied directly:
 
@@ -155,6 +157,15 @@ The bootstrap Job:
 - applies the policies configured in the Job (`admin` by default).
 
 Update `HERMES_POLICIES` in the Job if the user should map to an additional policy from your Vault setup.
+
+The Kubernetes auth bootstrap Job:
+- waits for Vault to be reachable,
+- ensures the `kubernetes` auth method exists,
+- configures the cluster API connection using the in-cluster service account,
+- writes/updates the `hermes-agent` role bound to the `hermes-agent` service account in the `hermes` namespace,
+- applies the policies configured in the Job (`admin` by default).
+
+Update `K8S_ROLE_POLICIES`, `K8S_ROLE_NAMESPACE`, or `K8S_ROLE_SERVICE_ACCOUNT` in the Job if your target workload uses different values.
 
 ## Recommended next steps
 

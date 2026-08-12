@@ -6,3 +6,5 @@ resources:
   - userpass-bootstrap-job.yaml
   - vault-bootstrap-token.sealedsecret.yaml
   - vault-userpass-hermes.sealedsecret.yaml
+  - kubernetes-auth-bootstrap-configmap.yaml
+  - kubernetes-auth-bootstrap-job.yaml
