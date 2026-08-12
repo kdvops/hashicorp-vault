@@ -158,3 +158,62 @@ Update `KALCALA_POLICIES` in the Job if the user should map to an additional pol
 - Configure auto-unseal with a KMS or HSM-backed mechanism when you are ready for production hardening.
 - Add auth methods and policies for your workloads, for example Kubernetes auth.
 - Restrict `NodePort` access with firewall rules or a private network path.
+
+
+
+
+
+##########################################
+
+
+
+
+
+####  hacer login 
+export VAULT_ADDR="http://10.0.0.100:30200"
+vault login
+
+####  crear policy admin
+cat > /tmp/admin.hcl <<'EOF'
+# Administración general de Vault
+path "*" {
+  capabilities = ["create", "read", "update", "delete", "list", "patch", "sudo"]
+}
+EOF
+
+
+#### aplicar policy admin
+vault policy write admin /tmp/admin.hcl
+
+#### leer policy
+vault policy read admin
+
+#### listar todas las policy
+vault auth list
+
+#### habilitar policy userpass | si no esta activo
+#vault auth enable userpass
+
+#### Crear usuario
+vault write auth/userpass/users/kalcala \
+  password='TuPasswordSegura'
+
+#### Crear usuario y asignar a policy en 1 solo paso 
+
+#vault write auth/userpass/users/kalcala \
+#  password='TuPasswordSegura' \
+#  token_policies='admin'
+  
+#### leer detalles de usuario   
+vault read auth/userpass/users/kalcala
+
+#### asignar policy a usuario
+vault write auth/userpass/users/kalcala \
+  token_policies="admin"
+
+
+#### hacer login usando userpass
+vault login -method=userpass username=kalcala
+
+#### ver detalles de usuario logueado
+vault token lookup
