@@ -42,7 +42,7 @@ k8s/
 ## Design choices
 
 - Uses integrated Raft instead of Consul to keep the stack smaller and easier to operate on k3s.
-- Leaves the initial `vault operator init` and unseal flow as a manual step so no bootstrap secrets are committed to Git.
+- Leaves the initial `vault operator init` and unseal flow as a manual step so no plaintext bootstrap secrets are committed to Git.
 - Includes a GitOps bootstrap Job for `userpass` users that reads secrets from SealedSecrets committed in the repo.
 - Exposes Vault directly through `NodePort` so you can access it with the IP of a k3s node.
 - Uses the k3s `local-path` storage class in the overlay.

@@ -45,7 +45,7 @@
 - Headless service for raft/internal traffic: `vault-internal`
 
 ## Secret / credential locations
-- No bootstrap secrets are committed to the repo.
+- No plaintext bootstrap secrets are committed to the repo; the sealed bootstrap manifests are versioned instead.
 - Initial Vault unseal keys and root token are generated manually during `vault operator init` and must be stored offline.
 - GitOps `userpass` bootstrap includes two SealedSecrets in the `vault` namespace:
   - `vault-bootstrap-token` with key `token`
