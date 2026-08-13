@@ -34,6 +34,8 @@ spec:
               value: hermes
             - name: K8S_ROLE_SERVICE_ACCOUNT
               value: hermes-agent
+            - name: K8S_ROLE_AUDIENCE
+              value: vault
             - name: K8S_ROLE_POLICIES
               value: admin
             - name: K8S_ROLE_TTL

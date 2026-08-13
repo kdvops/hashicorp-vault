@@ -161,9 +161,12 @@ Update `HERMES_POLICIES` in the Job if the user should map to an additional poli
 The Kubernetes auth bootstrap Job:
 - waits for Vault to be reachable,
 - ensures the `kubernetes` auth method exists,
-- configures the cluster API connection using the in-cluster service account,
+- configures the cluster API connection using the in-cluster service account and the canonical Kubernetes API endpoint,
 - writes/updates the `hermes-agent` role bound to the `hermes-agent` service account in the `hermes` namespace,
+- requires workload tokens to be minted with audience `vault`,
 - applies the policies configured in the Job (`admin` by default).
+
+The bootstrap jobs talk to the active Vault pod through the headless service DNS so they don't depend on the ClusterIP proxy path.
 
 Update `K8S_ROLE_POLICIES`, `K8S_ROLE_NAMESPACE`, or `K8S_ROLE_SERVICE_ACCOUNT` in the Job if your target workload uses different values.
 

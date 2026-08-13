@@ -51,6 +51,8 @@
   - `vault-bootstrap-token` with key `token`
   - `vault-userpass-hermes` with key `password`
 - The same overlay also configures Kubernetes auth for the `hermes-agent` service account in the `hermes` namespace.
+- The `hermes-agent` role expects workload service account tokens with audience `vault`.
+- The bootstrap jobs use the headless Vault service DNS so they always talk to the active pod directly.
 - Any future auth methods, policies, or K8s auth config should live in separate manifests or external secret management, not in plaintext here.
 
 ## Repo-specific hazards

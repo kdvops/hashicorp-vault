@@ -8,7 +8,7 @@ data:
     #!/bin/sh
     set -eu
 
-    : "${VAULT_SERVICE_HOST:=vault.vault.svc.cluster.local}"
+    : "${VAULT_SERVICE_HOST:=vault-0.vault-internal.vault.svc.cluster.local}"
     : "${VAULT_SERVICE_PORT:=8200}"
     : "${VAULT_ADDR:=http://${VAULT_SERVICE_HOST}:${VAULT_SERVICE_PORT}}"
     : "${VAULT_NAMESPACE:=vault}"
@@ -16,6 +16,7 @@ data:
     : "${K8S_ROLE_NAME:=hermes-agent}"
     : "${K8S_ROLE_NAMESPACE:=hermes}"
     : "${K8S_ROLE_SERVICE_ACCOUNT:=hermes-agent}"
+    : "${K8S_ROLE_AUDIENCE:=vault}"
     : "${K8S_ROLE_POLICIES:=admin}"
     : "${K8S_ROLE_TTL:=1h}"
 
@@ -52,7 +53,7 @@ data:
 
     reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
     kubernetes_ca_cert="$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)"
-    kubernetes_host="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT_HTTPS:-443}"
+    kubernetes_host="https://kubernetes.default.svc:443"
 
     echo "Configuring kubernetes auth backend"
     vault write "auth/${K8S_AUTH_MOUNT}/config" \
@@ -64,6 +65,7 @@ data:
     vault write "auth/${K8S_AUTH_MOUNT}/role/${K8S_ROLE_NAME}" \
       bound_service_account_names="${K8S_ROLE_SERVICE_ACCOUNT}" \
       bound_service_account_namespaces="${K8S_ROLE_NAMESPACE}" \
+      audience="${K8S_ROLE_AUDIENCE}" \
       token_policies="${K8S_ROLE_POLICIES}" \
       token_ttl="${K8S_ROLE_TTL}"
 
