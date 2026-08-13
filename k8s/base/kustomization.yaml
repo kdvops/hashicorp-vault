@@ -12,4 +12,5 @@ resources:
   - networkpolicy-default-deny.yaml
   - networkpolicy-allow-internal.yaml
   - networkpolicy-allow-dns.yaml
+  - networkpolicy-allow-kubernetes-api.yaml
   - ClusterRoleBinding.yaml

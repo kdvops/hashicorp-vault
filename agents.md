@@ -59,6 +59,7 @@
 - Storage size and `local-path` assumptions are in `k8s/overlays/k3s/statefulset-patch.yaml`.
 - Vault is not auto-initialized or auto-unsealed.
 - NetworkPolicies are restrictive; internal/DNS access is explicitly allowed.
+- Kubernetes auth also needs egress to the Kubernetes API server so Vault can validate service account JWTs.
 
 ## Verification
 - Render/apply the overlay:

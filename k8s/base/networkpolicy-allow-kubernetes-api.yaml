@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: vault-allow-kubernetes-api
+  namespace: vault
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: vault
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 10.43.0.1/32
+      ports:
+        - protocol: TCP
+          port: 443
+    - to:
+        - ipBlock:
+            cidr: 10.0.0.101/32
+      ports:
+        - protocol: TCP
+          port: 6443
